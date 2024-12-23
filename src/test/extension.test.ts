@@ -1,15 +1,21 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
+import * as Trimmer from '../extension';
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+	const examples = [
+		[`no change`, `no change`],
+		[`   one line`, `one line`],
+		[`  two\n  lines`, `two\nlines`],
+		[`  one\n  two\n    three\n      four`, `one\ntwo\n  three\n    four`],
+		[`  one\n  two\nthree`, `  one\n  two\nthree`]
+	];
+	test('test trimming', () => {
+		examples.forEach(([input, expected]) => {
+			const trimmed = Trimmer.trim(input);
+			assert.deepEqual(trimmed, expected, `expected\n====\n${input}\n====\nto trim to\n====\n${expected}\n=====\nGot\n=====\n${trimmed}\n=====`);
+		});
 	});
 });
