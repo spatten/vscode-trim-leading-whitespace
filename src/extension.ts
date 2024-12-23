@@ -1,32 +1,30 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const leadingSpacesMatcher = /^(\s*)/;
+
+const trim = (selected: string): string => {
+	const lines = selected.split("\n");
+	const leadingSpaceCount = lines.reduce((acc, currentLine) => {
+		const match = currentLine.match(leadingSpacesMatcher);
+		const numLeading = match && match.length >= 2 ? match[1].length : 0;
+		console.log(`numLeading: ${numLeading}, line: '${currentLine}`);
+		return (acc === -1 || numLeading < acc) ? numLeading : acc;
+	}, -1);
+	console.log(`leading space count: ${leadingSpaceCount}`);
+	const spaceRegex = RegExp(`^${' '.repeat(leadingSpaceCount)}`);
+	const fixed = lines.map(l => l.replace(spaceRegex, ''));
+	return fixed.join("\n");
+};
+
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "trim-leading-whitespace" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('trim-leading-whitespace.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from trim-leading-whitespace!');
-	});
   const trimLeadingWhitespace = vscode.commands.registerTextEditorCommand('trim-leading-whitespace.trimLeadingWhitespace', async (te, edit) => {
-    await trimIt(te, edit);
+    const selected = te.document.getText(te.selection);
+		const trimmed = trim(selected);
+		edit.replace(te.selection, trimmed);
   });
   context.subscriptions.push(trimLeadingWhitespace);
+
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
 
-const trimIt = async (editor: vscode.TextEditor, editBuilder: vscode.TextEditorEdit) => {
-	vscode.window.showInformationMessage('Hello World from trim-leading-whitespace!');
-}
