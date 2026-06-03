@@ -10,7 +10,13 @@ suite('Extension Test Suite', () => {
 		[`   one line`, `one line`],
 		[`  two\n  lines`, `two\nlines`],
 		[`  one\n  two\n    three\n      four`, `one\ntwo\n  three\n    four`],
-		[`  one\n  two\nthree`, `  one\n  two\nthree`]
+		[`  one\n  two\nthree`, `  one\n  two\nthree`],
+		// An empty line in the middle should not block trimming, and stays empty.
+		[`  one\n\n  two`, `one\n\ntwo`],
+		// A whitespace-only line is ignored for the indent and normalized to empty.
+		[`    one\n  \n    two`, `one\n\ntwo`],
+		// Leading/trailing empty lines are preserved as empty.
+		[`\n  one\n  two\n`, `\none\ntwo\n`]
 	];
 	test('test trimming', () => {
 		examples.forEach(([input, expected]) => {
